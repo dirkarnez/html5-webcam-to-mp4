@@ -33,14 +33,12 @@
     <script>
         let mediaRecorder;
         let recordedBlobs;
-    
+        const videoElement = document.getElementById("preview");
+        
         // 1. Get user media and start preview
         async function startRecording() {
-            const videoElement = document.getElementById("preview");
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    
-    
-    
+            
             // Check if MP4 is supported, otherwise fallback might be necessary (e.g., 'video/webm')
             const options = { mimeType: 'video/mp4' };
             if (!MediaRecorder.isTypeSupported(options.mimeType)) {
@@ -86,10 +84,16 @@
                 a.download = 'webcam-recording.mp4'; // Specify filename with mp4 extension
                 document.body.appendChild(a);
                 a.click();
+                
                 setTimeout(() => {
                     document.body.removeChild(a);
                     window.URL.revokeObjectURL(url);
                 }, 100);
+                
+                if (videoElement.srcObject) {
+                    videoElement.srcObject.getTracks().forEach((track) => track.stop());
+                    videoElement.srcObject = null;
+                }
             };
         }
         </script>
